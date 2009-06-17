@@ -1,7 +1,18 @@
 #!/usr/bin/env perl
 
+use File::Copy;
+use File::Temp;
+use IO::File;
+
 use strict;
 use warnings FATAL => qw(all);
+
+# lines matching PATTERN will be replaced with a notice, built from FORMAT
+# format will be used in sprintf(), with %s being replaced by '2001, 2002'
+my $COPY_NOTICE_PATTERN =
+    qr/Copyright \(c\) (?:[-\d, ]+ )?Zmanda(?:,? Inc\.)? +All Rights Reserved\./;
+my $COPY_NOTICE_FORMAT =
+    'Copyright (c) %s Zmanda, Inc.  All Rights Reserved.';
 
 my %all_files = ();
 
@@ -36,5 +47,21 @@ while (my $l = <GIT>) {
 close(GIT);
 
 foreach my $fn (keys %all_files) {
-    print($fn . " " . join(', ', sort(keys(%{$all_files{$fn}}))) . "\n");
+    my $new_notice = sprintf($COPY_NOTICE_FORMAT,
+        join(',', sort(keys(%{$all_files{$fn}}))));
+
+    my $tmp = File::Temp->new(UNLINK => 0) or
+        die "failed to create temporary file for $fn";
+    my $file = IO::File->new($fn, 'r');
+
+    while (my $l = <$file>) {
+        $l =~ s/$COPY_NOTICE_PATTERN/$new_notice/;
+        print $tmp $l;
+    }
+
+    close($tmp);
+    close($file);
+
+    copy($tmp->filename, $fn) or
+        die "copying $tmp->filename to $fn failed: $!";
 }
