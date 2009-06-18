@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+# Copyright (c) 2009, Nikolas Coukouma. All rights reserved.
+# Distributed under the terms of a BSD-style license. See COPYING for details.
+
 use File::Copy;
 use File::Temp;
 use IO::File;
