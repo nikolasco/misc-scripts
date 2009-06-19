@@ -20,13 +20,13 @@ my $COPY_NOTICE_FORMAT =
 my %all_files = ();
 
 my $cmd = 'git ls-files';
-open(GIT, '-|', $cmd) or
+open(my $git, '-|', $cmd) or
     die "failed to run \"$cmd\"";
-while (my $l = <GIT>) {
+while (my $l = <$git>) {
     chomp($l);
     $all_files{$l} = {};
 }
-close(GIT);
+close($git);
 
 my $cur_year;
 {
@@ -35,10 +35,10 @@ my $cur_year;
 }
 
 $cmd = 'git log \'--pretty=format:commit %H at %ai\' --name-only';
-open(GIT, '-|', $cmd) or
+open($git, '-|', $cmd) or
     die "failed to run \"$cmd\"";
 my $year;
-while (my $l = <GIT>) {
+while (my $l = <$git>) {
     chomp($l);
     if ($l =~ /^commit [0-9a-f]{40} at (\d{4})-\d{2}-\d{2} \d{1,2}:\d{1,2}:\d{1,2} [+-]\d{4}$/) {
         $year = $1+0;
@@ -47,7 +47,7 @@ while (my $l = <GIT>) {
         $all_files{$l}->{$year} = 1 if $all_files{$l};
     }
 }
-close(GIT);
+close($git);
 
 foreach my $fn (keys %all_files) {
     my $new_notice = sprintf($COPY_NOTICE_FORMAT,
