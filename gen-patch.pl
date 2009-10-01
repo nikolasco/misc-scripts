@@ -4,7 +4,6 @@
 # Distributed under the terms of a BSD-style license. See COPYING for details.
 
 use File::Copy;
-use File::Temp;
 use IO::File;
 
 use strict;
