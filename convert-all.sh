@@ -10,10 +10,10 @@
 # gstreamer0.10-tools (for gst-launch)
 # gstreamer0.10-plugins-bad (for faad - AAC decoder)
 # gstreamer0.10-ffmpeg (for ffdemux_mov_mp4_m4a_3gp_3g2_mj2)
-# gstreamer0.10-plugins-ugly (for lame - MP3 encoder)
+# gstreamer0.10-plugins-ugly-multiverse (for lamemp3enc - MP3 encoder)
 # gstreamer0.10-plugins-good (for id3v2mux - metadata muxer)
 
-for i in $(ls *.m4a | sed -e s/.m4a$//); do
+for i in $(ls *.m4a | sed -e s/\.m4a$//); do
 
   if [ ! -f $i.ogg ]; then
     echo "converting $i.m4a to $i.ogg"
@@ -27,7 +27,7 @@ for i in $(ls *.m4a | sed -e s/.m4a$//); do
     gst-launch-0.10 filesrc location=$i.m4a ! \
       ffdemux_mov_mp4_m4a_3gp_3g2_mj2 ! faad ! audioresample ! \
       audio/x-raw-int, rate=44100 ! \
-      lame mode=4 bitrate=64 ! id3v2mux ! \
+      lamemp3enc target=bitrate bitrate=64 ! id3v2mux ! \
       filesink location=$i.mp3
   fi
 
